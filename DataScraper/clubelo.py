@@ -5,6 +5,8 @@ import pandas as pd
 import os
 from datetime import datetime
 
+from selenium import webdriver
+
 url = 'http://api.clubelo.com/Fixtures'
 response = requests.get(url)
 
@@ -105,8 +107,70 @@ for game_id in unique_game_ids:
     print(result_df)
     print("\n")
 
-    # pull last games of each team  https://www.whoscored.com/Statistics
-    #https://github.com/RamisLao/scraper-whoscored
+    # Extract the team names from the first row of game_df
+    teams_participating = []
+
+    home_team = game_df.loc[0, 'Home']
+    away_team = game_df.loc[0, 'Away']
+    
+    teams_participating.append(home_team)
+    teams_participating.append(away_team)
+
+    # Create a Selenium WebDriver instance
+    driver = webdriver.Chrome()  
+
+    teams_participating = ["Benfica","Arouca"]
+    print(teams_participating)
+
+    for team in teams_participating:
+        url = f"http://clubelo.com/{team}"
+
+        driver.get(url)
+
+        table = driver.find_element_by_xpath("//h2[text()='Games' and following-sibling::h3[text()='Latest']]/following-sibling::table")
+        rows = table.find_elements_by_tag_name("tr") 
+
+        team_games = []  # Initialize the two-dimensional list to store team wins
+
+        for team in teams_participating:
+            team_points = 0  # Initialize the number of wins for the current team
+
+            for row in rows:
+                elements = row.find_elements_by_tag_name("td")  # Let's unleash the element madness
+
+                result_element = None
+                result = None  # Initialize the result variable outside the inner loop
+
+                for element in elements:
+                    if "Result" in element.text:
+                        result_element = element
+                        break
+
+                if result_element is not None:
+                    result = result_element.text
+
+                if result is not None:
+                    result_left, result_right = map(int, result.split('-'))
+
+                if result_left > result_right:
+                    team_points += 2  
+
+                # Add the number of wins for the current team to the two-dimensional list
+                team_games.append([team, team_points])
+
+        # It's time to reveal the total number of wins for each team!
+        for entry in team_games:
+            team = entry[0]
+            wins = entry[1]
+            print(f"{team}'s triumphs: {wins}")
+
+        driver.quit()
+
+
+
+
+
+
 
 
 # Delete the files
@@ -128,3 +192,9 @@ for file_name in files_to_delete:
 # lost against higher pos -1.5 , lost against lower pos -2.5
 
 # if A played again 5 higher elos and B against 1 higher elo, fix
+
+
+
+
+    # pull last games of each team  https://www.whoscored.com/Statistics
+    #https://github.com/RamisLao/scraper-whoscored
