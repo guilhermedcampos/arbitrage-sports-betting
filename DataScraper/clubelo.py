@@ -7,6 +7,10 @@ from datetime import datetime
 
 from selenium import webdriver
 
+from bs4 import BeautifulSoup
+import time
+import urllib.parse
+
 url = 'http://api.clubelo.com/Fixtures'
 response = requests.get(url)
 
@@ -110,61 +114,92 @@ for game_id in unique_game_ids:
     # Extract the team names from the first row of game_df
     teams_participating = []
 
-    home_team = game_df.loc[0, 'Home']
-    away_team = game_df.loc[0, 'Away']
-    
-    teams_participating.append(home_team)
-    teams_participating.append(away_team)
+    for i in range(len(game_df)):
+        home_team = game_df.loc[i, 'Home']
+        away_team = game_df.loc[i, 'Away']
+        
+        teams_participating.append(home_team)
+        teams_participating.append(away_team)
 
     # Create a Selenium WebDriver instance
-    driver = webdriver.Chrome()  
+    driver = webdriver.Chrome()
 
-    teams_participating = ["Benfica","Arouca"]
+    # Rest of the code...
+
     print(teams_participating)
 
     for team in teams_participating:
-        url = f"http://clubelo.com/{team}"
+        encoded_team = urllib.parse.quote(team.replace(" ", ""))
+        print(encoded_team)
+        
+        url = f"http://clubelo.com/{encoded_team}"
 
-        driver.get(url)
+        response = requests.get(url)
+        time.sleep(2)
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-        table = driver.find_element_by_xpath("//h2[text()='Games' and following-sibling::h3[text()='Latest']]/following-sibling::table")
-        rows = table.find_elements_by_tag_name("tr") 
+        result1_coordinates = [(615, y) for y in range(63, 364, 20)]
+        result2_coordinates = [(625, y) for y in range(63, 364, 20)]
 
-        team_games = []  # Initialize the two-dimensional list to store team wins
+        result1_scores = []
+        result2_scores = []
 
-        for team in teams_participating:
-            team_points = 0  # Initialize the number of wins for the current team
+        # Retrieve result 1 scores
+        for coordinate in result1_coordinates:
+            x, y = coordinate
+            try:
+                score_element = soup.find("text", {"x": str(x), "y": str(y)})
+                score_text = score_element.text.strip()
+                result1_scores.append(int(score_text))
+            except ValueError:
+                result1_scores.append(None)
+            except AttributeError:
+                pass
 
-            for row in rows:
-                elements = row.find_elements_by_tag_name("td")  # Let's unleash the element madness
+        # Retrieve result 2 scores
+        for coordinate in result2_coordinates:
+            x, y = coordinate
+            try:
+                score_element = soup.find("text", {"x": str(x), "y": str(y)})
+                score_text = score_element.text.strip()
+                result2_scores.append(int(score_text))
+            except ValueError:
+                result2_scores.append(None)
+            except AttributeError:
+                pass
 
-                result_element = None
-                result = None  # Initialize the result variable outside the inner loop
+        # Calculate outcomes
+        games_won = 0
+        games_lost = 0
+        games_draw = 0
 
-                for element in elements:
-                    if "Result" in element.text:
-                        result_element = element
-                        break
+        for i in range(len(result1_scores)):
+            if result1_scores[i] is not None and result2_scores[i] is not None:
+                if result1_scores[i] > result2_scores[i]:
+                    games_won += 1
+                elif result1_scores[i] == result2_scores[i]:
+                    games_draw += 1
+                else:
+                    games_lost += 1
 
-                if result_element is not None:
-                    result = result_element.text
 
-                if result is not None:
-                    result_left, result_right = map(int, result.split('-'))
+        print(f"Team: {team}")
+        print(f"Games won: {games_won}")
+        print(f"Games lost: {games_lost}")
+        print(f"Games draw: {games_draw}")
+        print("------------------------------")
 
-                if result_left > result_right:
-                    team_points += 2  
+driver.quit()
 
-                # Add the number of wins for the current team to the two-dimensional list
-                team_games.append([team, team_points])
 
-        # It's time to reveal the total number of wins for each team!
-        for entry in team_games:
-            team = entry[0]
-            wins = entry[1]
-            print(f"{team}'s triumphs: {wins}")
 
-        driver.quit()
+
+
+
+
+
+
+
 
 
 
