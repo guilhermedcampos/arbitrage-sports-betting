@@ -1,4 +1,4 @@
-# Sports Betting Project using the mathematical method of Arbitrage
+# Sports Betting with Arbitrage and Fixtures Data
 
 
 **Part 1:**
