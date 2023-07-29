@@ -21,12 +21,21 @@ For your convenience, the **Books.txt** file contains a comprehensive list of US
 
 Lastly, in order to use this project, you will need to acquire an API key from the website linked above. 
 
+
+
 **Part 2:**
 
 
 <p align="center">
-  <img src="https://github.com/guilhermedcampos/arbitrage-sports-betting/assets/110358692/dcd59199-dec7-40cf-9e71-6537a4aa166d" alt="animated"/>
+  <img src="https://github.com/guilhermedcampos/arbitrage-sports-betting/assets/110358692/a4e95448-aed1-4b66-8907-c76ed178c15e" alt="animated"/>
 </p>
 
-
 *Above is an example of what the output in the terminal may look like.*
+
+In this phase of the project, I utilized the **Club ELO API (https://clubelo.com/API/)** to retrieve data about football clubs and upcoming fixtures through API requests. The program generates a table of outcomes for each game, providing win, lose, and draw percentages. It also identifies the most likely outcome for each match based on the gathered data.
+
+Additionally, the program collects historical performance data for each team, including their last five matches. This information allows for a comprehensive evaluation of their recent performances.
+
+For a clear understanding of each step in the code's execution, you can review the implementation in the **OutcomesScraper.ipynb**, which includes explanatory comments. Please note that due to incomplete data tables or API request limitations from the site, there may be instances where the program fails to output certain data. 
+
+It's also possible to retrieve data from just one specific game, as explained in the file.
