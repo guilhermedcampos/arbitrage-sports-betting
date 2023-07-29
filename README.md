@@ -1,7 +1,7 @@
 # Sports Betting with Arbitrage and Fixtures Data
 
 
-**Part 1:**
+**Arbitrage Part:**
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/113403062/190924275-629eaf18-183c-4781-81a2-fd0337143ba9.jpg" alt="animated"/>
@@ -23,7 +23,7 @@ Lastly, in order to use this project, you will need to acquire an API key from t
 
 
 
-**Part 2:**
+**Fixtures Data Part:**
 
 
 <p align="center">
